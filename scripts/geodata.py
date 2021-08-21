@@ -1,3 +1,4 @@
+import copy
 import json
 import sys
 
@@ -28,12 +29,29 @@ def process_geodata(json_obj):
     return areas
 
 
+def find_limits(point_list):
+    """Find the upper and lower limits of a lis of points"""
+    upper = copy.copy(point_list[0])
+    lower = copy.copy(point_list[0])
+    for point in point_list[1:]:
+        if point[0] > upper[0]:
+            upper[0] = copy.copy(point[0])
+        if point[0] < lower[0]:
+            lower[0] = copy.copy(point[0])
+        if point[1] > upper[1]:
+            upper[1] = copy.copy(point[1])
+        if point[1] < lower[1]:
+            lower[1] = copy.copy(point[1])
+    return upper, lower
+
+
 def main(json_obj):
     """Convenience"""
-    process_geodata(json_obj)
-
+    a = process_geodata(json_obj)
+    print(a.keys())
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as json_file:
         json_object = json.load(json_file)
     main(json_object)
+
