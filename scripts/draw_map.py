@@ -3,9 +3,12 @@ import json
 import sys
 import time
 
+import numpy as np
+import pandas as pd
 import pygame
 
 import geodata
+import covid_stats
 from LGA import LocalGovArea
 
 
@@ -31,8 +34,23 @@ def main():
         lga_objects[lga] = LocalGovArea(None, viewable_lgas[lga], map_window)
         mapcanvas.blit(lga_objects[lga].mapsurface, (0, 0))
         pygame.display.update()
-        time.sleep(1)
-    pygame.display.update()
+
+    for idx, row in covid_stats.get_covid_data('../covid_data/confirmed_cases_table1_location.csv').iterrows():
+        for lga_name, value in row.items():
+            if not np.isnan(value):
+                # print(covid_stats.clean_lga(lga_name), value)
+                try:
+                    red = int(value) * 7
+                    if red > 255:
+                        red = 255
+                    lga_objects[covid_stats.clean_lga(lga_name)].trace_outline((red, 0, 0), fill=True)
+                    mapcanvas.blit(lga_objects[covid_stats.clean_lga(lga_name)].mapsurface, (0, 0))
+                    lga_objects[covid_stats.clean_lga(lga_name)].trace_outline((255, 255, 255))
+                    mapcanvas.blit(lga_objects[covid_stats.clean_lga(lga_name)].mapsurface, (0, 0))
+                except KeyError:
+                    pass
+                    # print(f"{lga_name} is not found")
+        pygame.display.update()
     time.sleep(2)
     pygame.display.update()
     time.sleep(12)

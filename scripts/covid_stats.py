@@ -1,8 +1,16 @@
 """Process the COVID data from data.gov.au"""
 
+import re
 import sys
 
 import pandas as pd
+
+
+def clean_lga(lga_name):
+    """Set the LGA name to upper case and remove and of the (C) (A) from the name"""
+    regexp = re.compile(r"^(.*?)(?:$|(?:\s\())")
+    cap = re.search(regexp, lga_name)
+    return cap.group(1).upper()
 
 
 def get_covid_data(covid_data_file):
@@ -19,4 +27,7 @@ def get_covid_data(covid_data_file):
 
 
 if __name__ == '__main__':
-    get_covid_data(sys.argv[1])
+    df = get_covid_data(sys.argv[1])
+    print(clean_lga("Wingecarribee (A)"))
+    [df.rename({x: clean_lga(x)}, axis='columns') for x in df.columns]
+    print(df)
