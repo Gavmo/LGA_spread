@@ -22,8 +22,8 @@ class LocalGovArea:
         self.bounding = bounding
         self.points_list = points_list
         self.mapsurface = pygame.surface.Surface(self.WINDOW_SIZE, pygame.SRCALPHA, 32)
-        self.trace_outline()
-        self.mapsurface.set_colorkey((0, 0, 0))
+        self.trace_outline((255, 255, 255))
+
         pygame.display.update()
 
     def dms_to_pix(self, coord, bounding):
@@ -32,17 +32,22 @@ class LocalGovArea:
         b = ((coord[1] - bounding[0][1]) / (bounding[1][1] - bounding[0][1])) * self.WINDOW_SIZE[1]
         return int(abs(a)), int(abs(b))
 
-    def trace_outline(self):
-        pen = (255, 255, 255)
+    def trace_outline(self, colour, fill=False):
+        pen = colour
+        if fill:
+            width = 0
+        else:
+            width = 2
         outlinemapsurface = pygame.surface.Surface(self.WINDOW_SIZE)
         points = [self.dms_to_pix(reverse_tuple(point), self.bounding) for point in self.points_list]
-        pygame.draw.polygon(outlinemapsurface, pen, points, width=2)
+        pygame.draw.polygon(outlinemapsurface, pen, points, width=width)
         newsurface = pygame.transform.rotate(outlinemapsurface, 90)
         self.mapsurface = pygame.transform.flip(newsurface, False, False)
+        self.mapsurface.set_colorkey((0, 0, 0))
 
 
 def main():
-    """"""
+    """This is for testing"""
     # -33.391159, 150.501858 Up Left
     # -34.131313, 151.417080 Down Right
     map_window = ((-33.391159, 150.501858), (-34.131313, 151.417080))
@@ -58,7 +63,11 @@ def main():
     mapcanvas.blit(c.mapsurface, (0, 0))
     mapcanvas.blit(d.mapsurface, (0, 0))
     pygame.display.update()
-    time.sleep(8)
+    time.sleep(2)
+    c.trace_outline((255, 0, 0), fill=True)
+    mapcanvas.blit(c.mapsurface, (0, 0))
+    pygame.display.update()
+    time.sleep(12)
 
 
 if __name__ == '__main__':
